@@ -115,7 +115,7 @@ class TorchHijackForC2pGen:
         if filename == "./pixelart_vgg19.pth":
             filename = path_pixelart_vgg19
 
-        return torch.load(filename, *args, **kwargs)
+        return torch.load(filename, *args, **kwargs, map_location=torch.device(device))
 
 
 c2pGen.torch = TorchHijackForC2pGen()
@@ -150,12 +150,12 @@ class Model(torch.nn.Module):
             self.G_A_net = define_G(3, 3, 64, "c2pGen", "instance", False, "normal", 0.02, [0])
             self.alias_net = define_G(3, 3, 64, "antialias", "instance", False, "normal", 0.02, [0])
 
-            G_A_state = torch.load(path_160_net_G_A)
+            G_A_state = torch.load(path_160_net_G_A, map_location=torch.device(device))
             for p in list(G_A_state.keys()):
                 G_A_state["module." + str(p)] = G_A_state.pop(p)
             self.G_A_net.load_state_dict(G_A_state)
 
-            alias_state = torch.load(path_alias_net)
+            alias_state = torch.load(path_alias_net, map_location=torch.device(device))
             for p in list(alias_state.keys()):
                 alias_state["module." + str(p)] = alias_state.pop(p)
             self.alias_net.load_state_dict(alias_state)
